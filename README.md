@@ -1,11 +1,27 @@
+<p align="center"><img src="https://droxey.com/statics/img/droxeybot.png" width="720"></p>
+
 # droxeybot
+
+[**@droxey**](https://github.com/droxey)'s customized Ender 3 build featuring SKR Mini E3 V2.0 / Hemera / Filament Detection / BLTouch / UPS / Power Relay.
+
+| Component                   | Part                                                                         | Repo                                                                                                                                              |
+|-----------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Motherboard**             | **BTT SKR MINI E3 V2.0**                                                     | [BIGTREETECH-SKR-mini-E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3/tree/master/firmware/V2.0/Marlin-2.0.x-SKR-mini-E3-V2.0)         |
+| **Extruder**                | **[Hemera Direct Drive](https://e3d-online.com/e3d-hemera-175-kit)**         | -                                                                                                                                                 |
+| **Power Supply**            | **MeanWell LRS-350-24U**                                                     | -                                                                                                                                                 |
+| **Filament Sensor**         | **BTT Smart Filament Detection**                                             | [smart-filament-detection-module](https://github.com/bigtreetech/smart-filament-detection-module)                                                 |
+| **Relay**                   | **BTT Relay v1.2**                                                           | [BIGTREETECH-Relay-V1.2](https://github.com/bigtreetech/BIGTREETECH-Relay-V1.2/tree/master/BIGTREETECH%20Relay%20V1.2/BIGTREETECH%20Relay%20V1.2) |
+| **UPS**                     | **BTT UPS 24V V1.0**                                                         | [BIGTREETECH-MINI-UPS-V2.0](https://github.com/bigtreetech/BIGTREETECH-MINI-UPS-V2.0/tree/master/BTT%20UPS%2024V%20V1.0)                          |
+| **Leveling /<br>Z Endstop** | **BLTouch v3.1**                                                             | -                                                                                                                                                 |
+| **Dual Z Axis**             | **[ExoSlide XZ Kit](https://www.exoslide.com/products/kits/ender3-XZ)**      | -                                                                                                                                                 |
+| **Upgraded Y Axis**         | **[ExoSlide Y Bed Kit](https://www.exoslide.com/products/kits/ender3-Ybed)** | -                                                                                                                                                 |
 
 <!-- omit in toc -->
 ## Table of Contents
 
-- [Components](#components)
-- [:one: Configure Base Firmware](#1️⃣-configure-base-firmware)
-- [2️⃣ Connect Hardware & Add Features](#2️⃣-connect-hardware--add-features)
+- [Configure Firmware](#configure-firmware)
+- [Connect Hardware & Add Features](#connect-hardware--add-features)
+  - [Step Daemon](#step-daemon)
   - [Jumpers](#jumpers)
   - [BLTouch](#bltouch)
   - [UPS](#ups)
@@ -13,53 +29,25 @@
   - [Smart Filament Detection Module](#smart-filament-detection-module)
 - [Resources & Credits](#resources--credits)
 
-## Components
+## Configure Firmware
 
-|                   Component |                             Part                             |                             Repo                             |
-| --------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|             **Motherboard** |                   **BTT SKR MINI E3 V2.0**                   | [BIGTREETECH-SKR-mini-E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3/tree/master/firmware/V2.0/Marlin-2.0.x-SKR-mini-E3-V2.0) |
-|                     **LCD** |                    **BTT TFT3.5 E3 V3.0**                    | [BIGTREETECH-TouchScreenFirmware](https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware) |
-|                **Extruder** | **[Hemera Direct Drive](https://e3d-online.com/e3d-hemera-175-kit)** |                              -                               |
-|            **Power Supply** |                   **MeanWell LRS-350-24U**                   |                              -                               |
-|         **Filament Sensor** |               **BTT Smart Filament Detection**               | [smart-filament-detection-module](https://github.com/bigtreetech/smart-filament-detection-module) |
-|                   **Relay** |                      **BTT Relay v1.2**                      | [BIGTREETECH-Relay-V1.2](https://github.com/bigtreetech/BIGTREETECH-Relay-V1.2/tree/master/BIGTREETECH%20Relay%20V1.2/BIGTREETECH%20Relay%20V1.2) |
-|                     **UPS** |                     **BTT UPS 24V V1.0**                     | [BIGTREETECH-MINI-UPS-V2.0](https://github.com/bigtreetech/BIGTREETECH-MINI-UPS-V2.0/tree/master/BTT%20UPS%2024V%20V1.0) |
-| **Leveling /<br>Z Endstop** |                       **BLTouch v3.1**                       |                              -                               |
-|             **Dual Z Axis** | **[ExoSlide XZ Kit](https://www.exoslide.com/products/kits/ender3-XZ)** |                              -                               |
-|         **Upgraded Y Axis** | **[ExoSlide Y Bed Kit](https://www.exoslide.com/products/kits/ender3-Ybed)** |                              -                               |
+```bash
+$ git clone git@github.com:MarlinFirmware/Marlin.git
+$ cd Marlin
+$ git checkout bugfix-2.0.x
+$ curl -o 1_UpdateFirmware.patch https://raw.githubusercontent.com/linsomniac/MarlinSKRMiniE3v2.0Files/master/essential_changes.patch
+$ curl -o 2_BLTouch.patch https://raw.githubusercontent.com/linsomniac/MarlinSKRMiniE3v2.0Files/master/bltouch.patch
+$ patch -p1 <1_UpdateFirmware.patch
+$ patch -p1 <2_BLTouch.patch
+```
 
+## Connect Hardware & Add Features
 
+### Step Daemon
 
----
+> Step Daemon (`stepd`) is an external planner for 3d printers that utilizes Marlin compatible firmware to allow direct step processing by an external computer and enables the use of complex pre-processing.
 
-
-
-## :one: Configure Base Firmware
-
-1. **Download [cheetah 5.0 R1.3.6.zip](https://drive.google.com/file/d/114b6tMWuw8pznXQKw7HimBD95mfjyYJG/view)**. Read more about Cheetah [here](https://kay3d.com/pages/kay3d-cheetah-5-firmware).
-
-2. **Open `platformio.ini`** and set `default_envs = STM32F103RC_btt_512K`.
-
-3. **Open `Configuration.h` and make the following changes:**
-
-   1. Select the BTT SKR E3 Mini v2.0 as the motherboard by uncommenting `#define BTTSKRE3MINIV2_0`.
-   1. To enable the display, uncomment `#define CR10_STOCKDISPLAY`.
-   1. Set the board's drivers to `TMC2209`:
-
-       ```c++
-       #define x_driver_type TMC2209  //For the X driver. See below for your driver type and replace change_value with it.
-       #define y_driver_type TMC2209  //For the Y driver. See below for your driver type and replace change_value with it.
-       #define z_driver_type TMC2209  //For the Z driver. See below for your driver type and replace change_value with it.
-       #define e_driver_type TMC2209  //For the E driver. See below for your driver type and replace change_value with it.
-       ```
-
-   1. Uncomment `#define Ender_3`.
-
-
-
-
-
-## 2️⃣ Connect Hardware & Add Features
+Set it up on your Raspberry Pi by following the instructions in the project's [README](https://github.com/colinrgodsey/step-daemon).
 
 ### Jumpers
 
@@ -68,15 +56,15 @@
 
 ### BLTouch
 
-<img src="https://droxey.com/static/img/bltouch.png" style="zoom: 25%;" >     Connect the BLTouch to `Z_PROBE` on the motherboard.
+<img src="https://droxey.com/statics/img/bltouch.png" style="zoom: 25%;" >     Connect the BLTouch to `Z_PROBE` on the motherboard.
 
 ### UPS
 
-<img src="https://droxey.com/static/img/ups.jpg" alt="img" style="zoom:33%;" />     Connect the UPS module to the `PWR_DE` pin on the motherboard.
+<img src="https://droxey.com/statics/img/ups.jpg" alt="img" style="zoom:33%;" />     Connect the UPS module to the `PWR_DE` pin on the motherboard.
 
 Open `Configuration_adv.h` and modify the following settings to match the following snippet:
 
-```c++
+```c
  #define POWER_LOSS_RECOVERY
  #if ENABLED(POWER_LOSS_RECOVERY)
    #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
@@ -96,11 +84,11 @@ Open `Configuration_adv.h` and modify the following settings to match the follow
 
 ### Relay
 
-<img src="https://droxey.com/static/img/relay.jpg" alt="img" style="zoom:33%;" />     Connect the relay to your power supply according to the diagram. Connect the relay to the `PS_ON` pin on your motherboard.
+<img src="https://droxey.com/statics/img/relay.jpg" alt="img" style="zoom:33%;" />     Connect the relay to your power supply according to the diagram. Connect the relay to the `PS_ON` pin on your motherboard.
 
 Open `Configuration.h` and make the following modifications to the firmware:
 
-```c++
+```c
 /**
  * Power Supply Control
  *
@@ -135,7 +123,7 @@ Finally, in your slicing software, add `M81` to the bottom of your end script.
 
 1. To configure the **Smart Filament Runout Sensor**, open `Configuration.h` and uncomment `#define FILAMENT_RUNOUT_SENSOR`. Then, **ensure your settings match the following**:
 
-   ```c++
+   ```c
    /**
     * Filament Runout Sensors
     * Mechanical or opto endstops are used to check for the presence of filament.
@@ -144,7 +132,7 @@ Finally, in your slicing software, add `M81` to the bottom of your end script.
     * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
     * By default the firmware assumes HIGH=FILAMENT PRESENT.
     */
-   // #define FILAMENT_RUNOUT_SENSOR
+   #define FILAMENT_RUNOUT_SENSOR
    #define FIL_RUNOUT_PIN PC15 // Filament detection pin for BTT SKR Mini E3 v2.0
    #if ENABLED(FILAMENT_RUNOUT_SENSOR)
        #define NUM_RUNOUT_SENSORS 1 // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
@@ -182,8 +170,9 @@ Finally, in your slicing software, add `M81` to the bottom of your end script.
 
    1. To enable runout detection on serial LCDs, uncomment `#define M114_DETAIL`. This allows runout detection to function in Marlin Mode.
    2. To add filament change support, uncomment `#define ADVANCED_PAUSE_FEATURE`. This feature also enables nozzle park when paused without further firmware modifications.
-   3. Uncomment `#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER` to enable `TFT35-v3.0-12864` LCD modes.
 
 ## Resources & Credits
 
-- Based on initial configuration provided by based on [Marlin 2.0.x guide, SKR Mini E3 v2.0, Ender 3](https://www.reddit.com/r/ender3/comments/h8y1ia/marlin_20x_guide_skr_mini_e3_v20_ender_3/), written by (u/qwewer1)[https://www.reddit.com/user/qwewer1/] on 06/14/2020.
+- Initial configuration based on [u/qwewer1](https://www.reddit.com/user/qwewer1/) post on Reddit, [Marlin 2.0.x guide, SKR Mini E3 v2.0, Ender 3](https://www.reddit.com/r/ender3/comments/h8y1ia/marlin_20x_guide_skr_mini_e3_v20_ender_3/) on 06/14/2020.
+- Shoutout to [@linsomniac](https://github.com/linsomniac)'s repository, [linsomniac/MarlinSKRMiniE3v2.0Files](https://github.com/linsomniac/MarlinSKRMiniE3v2.0Files). These patches are used to augment vanilla Marlin to support the SKR Mini E3 v2.0 motherboard.
+- [Step Daemon for Marlin](https://github.com/colinrgodsey/step-daemon).
