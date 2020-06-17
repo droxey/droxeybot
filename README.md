@@ -1,124 +1,189 @@
-# Marlin 3D Printer Firmware
+# droxeybot
 
-![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
-![GitHub contributors](https://img.shields.io/github/contributors/marlinfirmware/marlin.svg)
-![GitHub Release Date](https://img.shields.io/github/release-date/marlinfirmware/marlin.svg)
-[![Build Status](https://github.com/MarlinFirmware/Marlin/workflows/CI/badge.svg?branch=bugfix-2.0.x)](https://github.com/MarlinFirmware/Marlin/actions)
+<!-- omit in toc -->
+## Table of Contents
 
-<img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
+- [Components](#components)
+- [:one: Configure Base Firmware](#1️⃣-configure-base-firmware)
+- [2️⃣ Connect Hardware & Add Features](#2️⃣-connect-hardware--add-features)
+  - [Jumpers](#jumpers)
+  - [BLTouch](#bltouch)
+  - [UPS](#ups)
+  - [Relay](#relay)
+  - [Smart Filament Detection Module](#smart-filament-detection-module)
+- [Resources & Credits](#resources--credits)
 
-Additional documentation can be found at the [Marlin Home Page](https://marlinfw.org/).
-Please test this firmware and let us know if it misbehaves in any way. Volunteers are standing by!
+## Components
 
-## Marlin 2.0 Bugfix Branch
+|                   Component |                             Part                             |                             Repo                             |
+| --------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+|             **Motherboard** |                   **BTT SKR MINI E3 V2.0**                   | [BIGTREETECH-SKR-mini-E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3/tree/master/firmware/V2.0/Marlin-2.0.x-SKR-mini-E3-V2.0) |
+|                     **LCD** |                    **BTT TFT3.5 E3 V3.0**                    | [BIGTREETECH-TouchScreenFirmware](https://github.com/bigtreetech/BIGTREETECH-TouchScreenFirmware) |
+|                **Extruder** | **[Hemera Direct Drive](https://e3d-online.com/e3d-hemera-175-kit)** |                              -                               |
+|            **Power Supply** |                   **MeanWell LRS-350-24U**                   |                              -                               |
+|         **Filament Sensor** |               **BTT Smart Filament Detection**               | [smart-filament-detection-module](https://github.com/bigtreetech/smart-filament-detection-module) |
+|                   **Relay** |                      **BTT Relay v1.2**                      | [BIGTREETECH-Relay-V1.2](https://github.com/bigtreetech/BIGTREETECH-Relay-V1.2/tree/master/BIGTREETECH%20Relay%20V1.2/BIGTREETECH%20Relay%20V1.2) |
+|                     **UPS** |                     **BTT UPS 24V V1.0**                     | [BIGTREETECH-MINI-UPS-V2.0](https://github.com/bigtreetech/BIGTREETECH-MINI-UPS-V2.0/tree/master/BTT%20UPS%2024V%20V1.0) |
+| **Leveling /<br>Z Endstop** |                       **BLTouch v3.1**                       |                              -                               |
+|             **Dual Z Axis** | **[ExoSlide XZ Kit](https://www.exoslide.com/products/kits/ender3-XZ)** |                              -                               |
+|         **Upgraded Y Axis** | **[ExoSlide Y Bed Kit](https://www.exoslide.com/products/kits/ender3-Ybed)** |                              -                               |
 
-__Not for production use. Use with caution!__
 
-Marlin 2.0 takes this popular RepRap firmware to the next level by adding support for much faster 32-bit and ARM-based boards while improving support for 8-bit AVR boards. Read about Marlin's decision to use a "Hardware Abstraction Layer" below.
 
-This branch is for patches to the latest 2.0.x release version. Periodically this branch will form the basis for the next minor 2.0.x release.
+---
 
-Download earlier versions of Marlin on the [Releases page](https://github.com/MarlinFirmware/Marlin/releases).
 
-## Building Marlin 2.0
 
-To build Marlin 2.0 you'll need [Arduino IDE 1.8.8 or newer](https://www.arduino.cc/en/main/software) or [PlatformIO](http://docs.platformio.org/en/latest/ide.html#platformio-ide). We've posted detailed instructions on [Building Marlin with Arduino](https://marlinfw.org/docs/basics/install_arduino.html) and [Building Marlin with PlatformIO for ReArm](https://marlinfw.org/docs/basics/install_rearm.html) (which applies well to other 32-bit boards).
+## :one: Configure Base Firmware
 
-## Hardware Abstraction Layer (HAL)
+1. **Download [cheetah 5.0 R1.3.6.zip](https://drive.google.com/file/d/114b6tMWuw8pznXQKw7HimBD95mfjyYJG/view)**. Read more about Cheetah [here](https://kay3d.com/pages/kay3d-cheetah-5-firmware).
 
-Marlin 2.0 introduces a layer of abstraction so that all the existing high-level code can be built for 32-bit platforms while still retaining full 8-bit AVR compatibility. Retaining AVR compatibility and a single code-base is important to us, because we want to make sure that features and patches get as much testing and attention as possible, and that all platforms always benefit from the latest improvements.
+2. **Open `platformio.ini`** and set `default_envs = STM32F103RC_btt_512K`.
 
-### Current HALs
+3. **Open `Configuration.h` and make the following changes:**
 
-  #### AVR (8-bit)
+   1. Select the BTT SKR E3 Mini v2.0 as the motherboard by uncommenting `#define BTTSKRE3MINIV2_0`.
+   1. To enable the display, uncomment `#define CR10_STOCKDISPLAY`.
+   1. Set the board's drivers to `TMC2209`:
 
-  board|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Arduino AVR](https://www.arduino.cc/)|ATmega, ATTiny, etc.|16-20MHz|64-256k|2-16k|5V|no
+       ```c++
+       #define x_driver_type TMC2209  //For the X driver. See below for your driver type and replace change_value with it.
+       #define y_driver_type TMC2209  //For the Y driver. See below for your driver type and replace change_value with it.
+       #define z_driver_type TMC2209  //For the Z driver. See below for your driver type and replace change_value with it.
+       #define e_driver_type TMC2209  //For the E driver. See below for your driver type and replace change_value with it.
+       ```
 
-  #### DUE
+   1. Uncomment `#define Ender_3`.
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Arduino Due](https://www.arduino.cc/en/Guide/ArduinoDue), [RAMPS-FD](http://www.reprap.org/wiki/RAMPS-FD), etc.|[SAM3X8E ARM-Cortex M3](http://www.microchip.com/wwwproducts/en/ATsam3x8e)|84MHz|512k|64+32k|3.3V|no
 
-  #### ESP32
 
-  board|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [ESP32](https://www.espressif.com/en/products/hardware/esp32/overview)|Tensilica Xtensa LX6|240MHz|---|---|3.3V|---
 
-  #### LPC1768 / LPC1769
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Re-ARM](https://www.kickstarter.com/projects/1245051645/re-arm-for-ramps-simple-32-bit-upgrade)|[LPC1768 ARM-Cortex M3](http://www.nxp.com/products/microcontrollers-and-processors/arm-based-processors-and-mcus/lpc-cortex-m-mcus/lpc1700-cortex-m3/512kb-flash-64kb-sram-ethernet-usb-lqfp100-package:LPC1768FBD100)|100MHz|512k|32+16+16k|3.3-5V|no
-  [MKS SBASE](http://forums.reprap.org/read.php?13,499322)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
-  [Selena Compact](https://github.com/Ales2-k/Selena)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
-  [Azteeg X5 GT](https://www.panucatt.com/azteeg_X5_GT_reprap_3d_printer_controller_p/ax5gt.htm)|LPC1769 ARM-Cortex M3|120MHz|512k|32+16+16k|3.3-5V|no
-  [Smoothieboard](http://reprap.org/wiki/Smoothieboard)|LPC1769 ARM-Cortex M3|120MHz|512k|64k|3.3-5V|no
+## 2️⃣ Connect Hardware & Add Features
 
-  #### SAMD51
+### Jumpers
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Adafruit Grand Central M4](https://www.adafruit.com/product/4064)|[SAMD51P20A ARM-Cortex M4](https://www.microchip.com/wwwproducts/en/ATSAMD51P20A)|120MHz|1M|256k|3.3V|yes
+1. Remove the jumper from `Z_DIA3` to use the BLTouch as the Z endstop.
+2. Remove the jumper above `Z_PROBE` to enable the onboard 5v power supply.
 
-  #### STM32F1
+### BLTouch
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Arduino STM32](https://github.com/rogerclarkmelbourne/Arduino_STM32)|[STM32F1](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) ARM-Cortex M3|72MHz|256-512k|48-64k|3.3V|no
-  [Geeetech3D GTM32](https://github.com/Geeetech3D/Diagram/blob/master/Rostock301/Hardware_GTM32_PRO_VB.pdf)|[STM32F1](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) ARM-Cortex M3|72MHz|256-512k|48-64k|3.3V|no
+<img src="https://droxey.com/static/img/bltouch.png" style="zoom: 25%;" >     Connect the BLTouch to `Z_PROBE` on the motherboard.
 
-  #### STM32F4
+### UPS
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [STEVAL-3DP001V1](http://www.st.com/en/evaluation-tools/steval-3dp001v1.html)|[STM32F401VE Arm-Cortex M4](http://www.st.com/en/microcontrollers/stm32f401ve.html)|84MHz|512k|64+32k|3.3-5V|yes
+<img src="https://droxey.com/static/img/ups.jpg" alt="img" style="zoom:33%;" />     Connect the UPS module to the `PWR_DE` pin on the motherboard.
 
-  #### Teensy++ 2.0
+Open `Configuration_adv.h` and modify the following settings to match the following snippet:
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Teensy++ 2.0](http://www.microchip.com/wwwproducts/en/AT90USB1286)|[AT90USB1286](http://www.microchip.com/wwwproducts/en/AT90USB1286)|16MHz|128k|8k|5V|no
+```c++
+ #define POWER_LOSS_RECOVERY
+ #if ENABLED(POWER_LOSS_RECOVERY)
+   #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
+   #define BACKUP_POWER_SUPPLY       // Backup power / UPS to move the steppers on power loss
+   #define POWER_LOSS_ZRAISE       10 // (mm) Z axis raise on resume (on power loss with UPS)
+   #define POWER_LOSS_PIN         PC12 // Pin to detect power loss. Set to -1 to disable default pin on boards without module.
+   #define POWER_LOSS_STATE       HIGH // State of pin indicating power loss
+   #define POWER_LOSS_PULL           // Set pullup / pulldown as appropriate
+   #define POWER_LOSS_PURGE_LEN   20 // (mm) Length of filament to purge on resume
+   #define POWER_LOSS_RETRACT_LEN 10 // (mm) Length of filament to retract on fail. Requires backup power.
 
-  #### Teensy 3.1 / 3.2
+   // Without a POWER_LOSS_PIN the following option helps reduce wear on the SD card,
+   // especially with "vase mode" printing. Set too high and vases cannot be continued.
+   #define POWER_LOSS_MIN_Z_CHANGE 0.05 // (mm) Minimum Z change before saving power-loss data
+ #endif
+```
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Teensy 3.2](https://www.pjrc.com/store/teensy32.html)|[MK20DX256VLH7](https://www.mouser.com/ProductDetail/NXP-Freescale/MK20DX256VLH7) ARM-Cortex M4|72MHz|256k|32k|3.3V-5V|yes
+### Relay
 
-  #### Teensy 3.5 / 3.6
+<img src="https://droxey.com/static/img/relay.jpg" alt="img" style="zoom:33%;" />     Connect the relay to your power supply according to the diagram. Connect the relay to the `PS_ON` pin on your motherboard.
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Teensy 3.5](https://www.pjrc.com/store/teensy35.html)|[MK64FX512VMD12](https://www.mouser.com/ProductDetail/NXP-Freescale/MK64FX512VMD12) ARM-Cortex M4|120MHz|512k|192k|3.3-5V|yes
-  [Teensy 3.6](https://www.pjrc.com/store/teensy36.html)|[MK66FX1M0VMD18](https://www.mouser.com/ProductDetail/NXP-Freescale/MK66FX1M0VMD18) ARM-Cortex M4|180MHz|1M|256k|3.3V|yes
+Open `Configuration.h` and make the following modifications to the firmware:
 
-## Submitting Patches
+```c++
+/**
+ * Power Supply Control
+ *
+ * Enable and connect the power supply to the PS_ON_PIN.
+ * Specify whether the power supply is active HIGH or active LOW.
+ */
+#define PSU_CONTROL
+#define PSU_NAME "Power Supply"
 
-Proposed patches should be submitted as a Pull Request against the ([bugfix-2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x)) branch.
+#if ENABLED(PSU_CONTROL)
+  #define PSU_ACTIVE_HIGH true     // Set 'false' for ATX, 'true' for X-Box
 
-- This branch is for fixing bugs and integrating any new features for the duration of the Marlin 2.0.x life-cycle.
-- Follow the [Coding Standards](https://marlinfw.org/docs/development/coding_standards.html) to gain points with the maintainers.
-- Please submit your questions and concerns to the [Issue Queue](https://github.com/MarlinFirmware/Marlin/issues).
+  //#define PSU_DEFAULT_OFF         // Keep power off until enabled directly with M80
+  //#define PSU_POWERUP_DELAY 100   // (ms) Delay for the PSU to warm up to full power
 
-### [RepRap.org Wiki Page](http://reprap.org/wiki/Marlin)
+  // #define AUTO_POWER_CONTROL      // Enable automatic control of the PS_ON pin
+  #if ENABLED(AUTO_POWER_CONTROL)
+    #define AUTO_POWER_FANS         // Turn on PSU if fans need power
+    #define AUTO_POWER_E_FANS
+    #define AUTO_POWER_CONTROLLERFAN
+    #define AUTO_POWER_CHAMBER_FAN
+    //#define AUTO_POWER_E_TEMP        50 // (°C) Turn on PSU over this temperature
+    //#define AUTO_POWER_CHAMBER_TEMP  30 // (°C) Turn on PSU over this temperature
+    #define POWER_TIMEOUT 30
+  #endif
+#endif
+```
 
-## Credits
+Finally, in your slicing software, add `M81` to the bottom of your end script.
 
-The current Marlin dev team consists of:
+### Smart Filament Detection Module
 
- - Scott Lahteine [[@thinkyhead](https://github.com/thinkyhead)] - USA &nbsp; [Donate](http://www.thinkyhead.com/donate-to-marlin) / Flattr: [![Flattr Scott](http://api.flattr.com/button/flattr-badge-small.png)](https://flattr.com/submit/auto?user_id=thinkyhead&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
- - Roxanne Neufeld [[@Roxy-3D](https://github.com/Roxy-3D)] - USA
- - Chris Pepper [[@p3p](https://github.com/p3p)] - UK
- - Bob Kuhn [[@Bob-the-Kuhn](https://github.com/Bob-the-Kuhn)] - USA
- - João Brazio [[@jbrazio](https://github.com/jbrazio)] - Portugal
- - Erik van der Zalm [[@ErikZalm](https://github.com/ErikZalm)] - Netherlands &nbsp; [![Flattr Erik](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
+1. To configure the **Smart Filament Runout Sensor**, open `Configuration.h` and uncomment `#define FILAMENT_RUNOUT_SENSOR`. Then, **ensure your settings match the following**:
 
-## License
+   ```c++
+   /**
+    * Filament Runout Sensors
+    * Mechanical or opto endstops are used to check for the presence of filament.
+    *
+    * RAMPS-based boards use SERVO3_PIN for the first runout sensor.
+    * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
+    * By default the firmware assumes HIGH=FILAMENT PRESENT.
+    */
+   // #define FILAMENT_RUNOUT_SENSOR
+   #define FIL_RUNOUT_PIN PC15 // Filament detection pin for BTT SKR Mini E3 v2.0
+   #if ENABLED(FILAMENT_RUNOUT_SENSOR)
+       #define NUM_RUNOUT_SENSORS 1 // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
+       #if ENABLED(INVERT_FS_LOGIC)
+           #define FIL_RUNOUT_INVERTING true // Trigger's alternative as soon as invert filamentsensor logic is activated
+       #else
+           #define FIL_RUNOUT_INVERTING false // Logic inverting is automatically taken care in section 13
+       #endif
+       // Set to true to invert the logic of the sensor.
+       #if ENABLED(INVERTL_PINPULLUP_LOGIC)
+           #define FIL_RUNOUT_PULLDOWN // Use internal pulldown for filament runout pins.
+       #else
+           #define FIL_RUNOUT_PULLUP // Use internal pullup for filament runout pins.
+       #endif
 
-Marlin is published under the [GPL license](/LICENSE) because we believe in open development. The GPL comes with both rights and obligations. Whether you use Marlin firmware as the driver for your open or closed-source product, you must keep Marlin open, and you must provide your compatible Marlin source code to end users upon request. The most straightforward way to comply with the Marlin license is to make a fork of Marlin on Github, perform your modifications, and direct users to your modified fork.
+       // Set one or more commands to execute on filament runout.
+       // (After 'M412 H' Marlin will ask the host to handle the process.)
+       #define FILAMENT_RUNOUT_SCRIPT "M600"
 
-While we can't prevent the use of this code in products (3D printers, CNC, etc.) that are closed source or crippled by a patent, we would prefer that you choose another firmware or, better yet, make your own.
+       // After a runout is detected, continue printing this length of filament
+       // before executing the runout script. Useful for a sensor at the end of
+       // a feed tube. Requires 4 bytes SRAM per sensor, plus 4 bytes overhead.
+       #define FILAMENT_RUNOUT_DISTANCE_MM 7
+
+       #ifdef FILAMENT_RUNOUT_DISTANCE_MM
+       // Enable this option to use an encoder disc that toggles the runout pin
+       // as the filament moves. (Be sure to set FILAMENT_RUNOUT_DISTANCE_MM
+       // large enough to avoid false positives.)
+           #define FILAMENT_MOTION_SENSOR
+       #endif
+   #endif
+   ```
+
+2. In `Configuration_adv.h`, make the following changes:
+
+   1. To enable runout detection on serial LCDs, uncomment `#define M114_DETAIL`. This allows runout detection to function in Marlin Mode.
+   2. To add filament change support, uncomment `#define ADVANCED_PAUSE_FEATURE`. This feature also enables nozzle park when paused without further firmware modifications.
+   3. Uncomment `#define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER` to enable `TFT35-v3.0-12864` LCD modes.
+
+## Resources & Credits
+
+- Based on initial configuration provided by based on [Marlin 2.0.x guide, SKR Mini E3 v2.0, Ender 3](https://www.reddit.com/r/ender3/comments/h8y1ia/marlin_20x_guide_skr_mini_e3_v20_ender_3/), written by (u/qwewer1)[https://www.reddit.com/user/qwewer1/] on 06/14/2020.
