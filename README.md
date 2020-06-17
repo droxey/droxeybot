@@ -1,35 +1,18 @@
 # droxeybot
 
-<!-- omit in toc -->
-## Table of Contents
+[**@droxey**](https://github.com/droxey)'s customized Ender 3 build featuring SKR Mini E3 V2.0 / Hemera / Filament Detection / BLTouch / UPS / Power Relay.
 
-- [Components](#components)
-- [Configure Firmware](#configure-firmware)
-- [Connect Hardware & Add Features](#connect-hardware--add-features)
-  - [Step Daemon](#step-daemon)
-  - [Jumpers](#jumpers)
-  - [BLTouch](#bltouch)
-  - [UPS](#ups)
-  - [Relay](#relay)
-  - [Smart Filament Detection Module](#smart-filament-detection-module)
-- [Resources & Credits](#resources--credits)
-
-## Components
-
-|                   Component |                             Part                             |                             Repo                             |
-| --------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
-|             **Motherboard** |                   **BTT SKR MINI E3 V2.0**                   | [BIGTREETECH-SKR-mini-E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3/tree/master/firmware/V2.0/Marlin-2.0.x-SKR-mini-E3-V2.0) |
-|                **Extruder** | **[Hemera Direct Drive](https://e3d-online.com/e3d-hemera-175-kit)** |                              -                               |
-|            **Power Supply** |                   **MeanWell LRS-350-24U**                   |                              -                               |
-|         **Filament Sensor** |               **BTT Smart Filament Detection**               | [smart-filament-detection-module](https://github.com/bigtreetech/smart-filament-detection-module) |
-|                   **Relay** |                      **BTT Relay v1.2**                      | [BIGTREETECH-Relay-V1.2](https://github.com/bigtreetech/BIGTREETECH-Relay-V1.2/tree/master/BIGTREETECH%20Relay%20V1.2/BIGTREETECH%20Relay%20V1.2) |
-|                     **UPS** |                     **BTT UPS 24V V1.0**                     | [BIGTREETECH-MINI-UPS-V2.0](https://github.com/bigtreetech/BIGTREETECH-MINI-UPS-V2.0/tree/master/BTT%20UPS%2024V%20V1.0) |
-| **Leveling /<br>Z Endstop** |                       **BLTouch v3.1**                       |                              -                               |
-|             **Dual Z Axis** | **[ExoSlide XZ Kit](https://www.exoslide.com/products/kits/ender3-XZ)** |                              -                               |
-|         **Upgraded Y Axis** | **[ExoSlide Y Bed Kit](https://www.exoslide.com/products/kits/ender3-Ybed)** |                              -                               |
-
----
-
+| Component                   | Part                                                                         | Repo                                                                                                                                              |
+|-----------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Motherboard**             | **BTT SKR MINI E3 V2.0**                                                     | [BIGTREETECH-SKR-mini-E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3/tree/master/firmware/V2.0/Marlin-2.0.x-SKR-mini-E3-V2.0)         |
+| **Extruder**                | **[Hemera Direct Drive](https://e3d-online.com/e3d-hemera-175-kit)**         | -                                                                                                                                                 |
+| **Power Supply**            | **MeanWell LRS-350-24U**                                                     | -                                                                                                                                                 |
+| **Filament Sensor**         | **BTT Smart Filament Detection**                                             | [smart-filament-detection-module](https://github.com/bigtreetech/smart-filament-detection-module)                                                 |
+| **Relay**                   | **BTT Relay v1.2**                                                           | [BIGTREETECH-Relay-V1.2](https://github.com/bigtreetech/BIGTREETECH-Relay-V1.2/tree/master/BIGTREETECH%20Relay%20V1.2/BIGTREETECH%20Relay%20V1.2) |
+| **UPS**                     | **BTT UPS 24V V1.0**                                                         | [BIGTREETECH-MINI-UPS-V2.0](https://github.com/bigtreetech/BIGTREETECH-MINI-UPS-V2.0/tree/master/BTT%20UPS%2024V%20V1.0)                          |
+| **Leveling /<br>Z Endstop** | **BLTouch v3.1**                                                             | -                                                                                                                                                 |
+| **Dual Z Axis**             | **[ExoSlide XZ Kit](https://www.exoslide.com/products/kits/ender3-XZ)**      | -                                                                                                                                                 |
+| **Upgraded Y Axis**         | **[ExoSlide Y Bed Kit](https://www.exoslide.com/products/kits/ender3-Ybed)** | -                                                                                                                                                 |
 ## Configure Firmware
 
 ```bash
@@ -57,15 +40,19 @@ Set it up on your Raspberry Pi by following the instructions in the project's [R
 
 ### BLTouch
 
-<img src="https://droxey.com/static/img/bltouch.png" style="zoom: 25%;" >     Connect the BLTouch to `Z_PROBE` on the motherboard.
+<img src="https://droxey.com/statics/img/bltouch.png" style="zoom: 25%;" >
+
+Connect the BLTouch to `Z_PROBE` on the motherboard.
 
 ### UPS
 
-<img src="https://droxey.com/static/img/ups.jpg" alt="img" style="zoom:33%;" />     Connect the UPS module to the `PWR_DE` pin on the motherboard.
+<img src="https://droxey.com/statics/img/ups.jpg" alt="img" style="zoom:33%;" />
+
+Connect the UPS module to the `PWR_DE` pin on the motherboard.
 
 Open `Configuration_adv.h` and modify the following settings to match the following snippet:
 
-```c++
+```c
  #define POWER_LOSS_RECOVERY
  #if ENABLED(POWER_LOSS_RECOVERY)
    #define PLR_ENABLED_DEFAULT   false // Power Loss Recovery enabled by default. (Set with 'M413 Sn' & M500)
@@ -85,11 +72,13 @@ Open `Configuration_adv.h` and modify the following settings to match the follow
 
 ### Relay
 
-<img src="https://droxey.com/static/img/relay.jpg" alt="img" style="zoom:33%;" />     Connect the relay to your power supply according to the diagram. Connect the relay to the `PS_ON` pin on your motherboard.
+<img src="https://droxey.com/statics/img/relay.jpg" alt="img" style="zoom:33%;" />
+
+Connect the relay to your power supply according to the diagram. Connect the relay to the `PS_ON` pin on your motherboard.
 
 Open `Configuration.h` and make the following modifications to the firmware:
 
-```c++
+```c
 /**
  * Power Supply Control
  *
@@ -124,7 +113,7 @@ Finally, in your slicing software, add `M81` to the bottom of your end script.
 
 1. To configure the **Smart Filament Runout Sensor**, open `Configuration.h` and uncomment `#define FILAMENT_RUNOUT_SENSOR`. Then, **ensure your settings match the following**:
 
-   ```c++
+   ```c
    /**
     * Filament Runout Sensors
     * Mechanical or opto endstops are used to check for the presence of filament.
@@ -133,7 +122,7 @@ Finally, in your slicing software, add `M81` to the bottom of your end script.
     * For other boards you may need to define FIL_RUNOUT_PIN, FIL_RUNOUT2_PIN, etc.
     * By default the firmware assumes HIGH=FILAMENT PRESENT.
     */
-   // #define FILAMENT_RUNOUT_SENSOR
+   #define FILAMENT_RUNOUT_SENSOR
    #define FIL_RUNOUT_PIN PC15 // Filament detection pin for BTT SKR Mini E3 v2.0
    #if ENABLED(FILAMENT_RUNOUT_SENSOR)
        #define NUM_RUNOUT_SENSORS 1 // Number of sensors, up to one per extruder. Define a FIL_RUNOUT#_PIN for each.
